@@ -14,7 +14,7 @@ ortools作为完备算法，求解JSP问题非常强力，针对FT和LA级别的
 GWO的优化过程主要有每代种群中的最好三匹狼（具体构建时表示为三个最好的解）来指导完成。
 2）包围猎物
 灰狼捜索猎物时会逐渐地接近猎物并包围它，该行为的数学模型如下：
-![ima![image](https://user-images.githubusercontent.com/71360947/185347334-34fad858-a57d-4e6d-9aec-e24565851e91.png)
+![image](https://user-images.githubusercontent.com/71360947/185347334-34fad858-a57d-4e6d-9aec-e24565851e91.png)
 3）狩猎行为的数学模型在这里插入图片描述
 ![image](https://user-images.githubusercontent.com/71360947/185347438-be5620e7-ddfa-438a-83aa-a58599957b08.png)
 
