@@ -1,6 +1,6 @@
-用ortools和灰狼算法求解JSP和FJSP问题。
+#用ortools和灰狼算法求解JSP和FJSP问题。
 
-#if data_inital[2] == '1':
+if data_inital[2] == '1':
 在程序开始时，将输入数据的第一行第三元素，做一个判断，如果工序的平均机器数量为1，则进入 MinimalJobshopSat()函数，用ortools求解JSP问题。
 ortools作为完备算法，求解JSP问题非常强力，针对FT和LA级别的数据集，均能在短时间内求出最优解，这是常规的元启发式算法难以企及的。
 
@@ -9,7 +9,7 @@ ortools作为完备算法，求解JSP问题非常强力，针对FT和LA级别的
 
 
 
-灰狼算法的实现逻辑
+#灰狼算法的实现逻辑
 1）社会等级分层
 GWO的优化过程主要有每代种群中的最好三匹狼（具体构建时表示为三个最好的解）来指导完成。
 
@@ -28,12 +28,13 @@ GWO的优化过程主要有每代种群中的最好三匹狼（具体构建时�
 
 
 #代码及注释
+
 from __future__ import print_function
 import time
 import chardet
 import datetime
 import collections
-# Import Python wrapper for or-tools CP-SAT solver.
+Import Python wrapper for or-tools CP-SAT solver.
 from ortools.sat.python import cp_model
 import numpy as np
 import random
