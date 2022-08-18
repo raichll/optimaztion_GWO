@@ -1,4 +1,4 @@
-#用ortools和灰狼算法求解JSP和FJSP问题。
+# 用ortools和灰狼算法求解JSP和FJSP问题。
 
 if data_inital[2] == '1':
 在程序开始时，将输入数据的第一行第三元素，做一个判断，如果工序的平均机器数量为1，则进入 MinimalJobshopSat()函数，用ortools求解JSP问题。
@@ -9,7 +9,7 @@ ortools作为完备算法，求解JSP问题非常强力，针对FT和LA级别的
 
 
 
-#灰狼算法的实现逻辑
+# 灰狼算法的实现逻辑
 1）社会等级分层
 GWO的优化过程主要有每代种群中的最好三匹狼（具体构建时表示为三个最好的解）来指导完成。
 
@@ -27,7 +27,7 @@ GWO的优化过程主要有每代种群中的最好三匹狼（具体构建时�
 
 
 
-#代码及注释
+# 代码及注释
 
 from __future__ import print_function
 import time
@@ -44,7 +44,7 @@ warnings.filterwarnings("ignore")
 dt = datetime.datetime
 time_delta = datetime.timedelta
 
-#根据函数输入最优结果，进行排产操作。
+## 根据函数输入最优结果，进行排产操作。
 def final_caculate(job, machine, machine_time, machine_num, job_num):
     jobtime = np.zeros((1, job_num))
     tmm = np.zeros((1, machine_num))
@@ -52,7 +52,6 @@ def final_caculate(job, machine, machine_time, machine_num, job_num):
     job=list(job[0])
     for i in range(len(job)):
         job[i]=int(job[i])
-
     startime = 0
     list_Machine, list_Starttime, list_W = [], [], []
     for i in range(len(job)):
@@ -65,14 +64,11 @@ def final_caculate(job, machine, machine_time, machine_num, job_num):
             startime = tmm[0, sig]
             tmm[0, sig] = startime + machine_time[0, i]
             jobtime[0, svg] = startime + machine_time[0, i]
-
         tmmw[0, sig] += machine_time[0, i]
         list_Machine.append(machine[0, i])
         list_Starttime.append(startime)
         list_W.append(machine_time[0, i])
-
     job_frequency = [0] * len(job)
-
     for i in range(job_num):
         t = 1
         for j in range(len(job)):
@@ -80,11 +76,9 @@ def final_caculate(job, machine, machine_time, machine_num, job_num):
             if a == i:
                 job_frequency[j] = t
                 t += 1
-
     for i in range(len(job)):
         job[i]=str(job[i]+1).rjust(3, '0')
         job_frequency[i]=str(job_frequency[i]).rjust(2, '0')
-
     df_result = []
     df_temp = []
     for j in range(len(job)):
@@ -110,7 +104,7 @@ def final_caculate(job, machine, machine_time, machine_num, job_num):
         f.write(f'M{i+1}'+':' +strs+'\n')
     f.close()
 
-#灰狼算法类
+## 灰狼算法类
 class GWO_algorithm():
     def __init__(self, job_num, machine_num, p, iter, popsize_num):
         self.job_num = job_num  # 工件数
@@ -118,7 +112,6 @@ class GWO_algorithm():
         self.pi = p  #交叉概率
         self.generation = iter  # 迭代次数
         self.popsize = popsize_num  # 种群规模
-
     #分开输出每个工件的可用机器，可用机器时间，工序可用机器编号
     def coding(self, tr1):
         sigdex, mac, mact, sdx = [], [], [], []
@@ -144,7 +137,6 @@ class GWO_algorithm():
             siga = len(mac)
             widthx.append(siga)
         width = max(widthx)
-
         Tmachine, Tmachinetime = np.zeros((self.job_num, width)), np.zeros((self.job_num, width))
         tdx = []
         for i in range(self.job_num):
@@ -177,7 +169,6 @@ class GWO_algorithm():
             tom.append(tim)
         Tmachine=Tmachine+1
         return Tmachine, Tmachinetime, tdx, work, tom
-
     # 返回当前迭代种群机器编码和机器时间编码的列表形式。
     def MA_MAtime_List(self, W1, M1, T1):  # 把加工机器编码和加工时间编码转化为对应列表，目的是记录工件的加工时间和加工机器
         Ma_W1, Tm_W1, WCross = [], [], []
@@ -189,7 +180,6 @@ class GWO_algorithm():
             index = np.random.randint(0, 2, 1)[0]
             WCross[signal1].append(index)  # 随机生成一个为0或者1的列表，用于后续的机器的均匀交叉
         return Ma_W1, Tm_W1, WCross
-
     #返回单个例子机器编码和机器时间编码的列表形式。
     def MA_MAtime(self, W1, Ma_W1, Tm_W1):  # 列表返回机器及加工时间编码
         memory1 = np.zeros((1, self.job_num), dtype=np.int)
@@ -200,7 +190,6 @@ class GWO_algorithm():
             t1[0, i] = Tm_W1[signal1][memory1[0, signal1]]
             memory1[0, signal1] += 1
         return m1, t1
-
     #用于交换工序编码，产生种群多样性。
     def machine_cross(self, Ma_W1, Tm_W1, Ma_W2, Tm_W2, WCross):  # 机器均匀交叉
         MC1, MC2, TC1, TC2 = [], [], [], []
@@ -214,7 +203,6 @@ class GWO_algorithm():
                     MC2[i].append(Ma_W1[i][j]), MC1[i].append(Ma_W2[i][j]), TC2[i].append(Tm_W1[i][j]), TC1[i].append(
                         Tm_W2[i][j])
         return MC1, TC1, MC2, TC2
-
     #用于创造工序编码，机器编码，时间编码，利于后续灰狼算法的运算。
     def creat_process(self):
         initial_a = np.random.rand(len(self.work))
@@ -223,7 +211,6 @@ class GWO_algorithm():
         for i in range(len(self.work)):
             job.append(self.work[index_work[i]])
         job = np.array(job).reshape(1, len(self.work))
-
         ccount = np.zeros((1, self.job_num), dtype=np.int)
         machine = np.ones((1, job.shape[1]))
         machine_time = np.ones((1, job.shape[1]))  # 初始化矩阵
@@ -260,12 +247,10 @@ class GWO_algorithm():
                 startime = tmm[0, sig]
                 tmm[0, sig] = startime + machine_time[0, i]
                 jobtime[0, svg] = startime + machine_time[0, i]
-
             tmmw[0, sig] += machine_time[0, i]
             list_M.append(machine[0, i])
             list_S.append(startime)
             list_W.append(machine_time[0, i])
-
         tmax = np.argmax(tmm[0]) + 1  # 结束最晚的机器
         C_finish = max(tmm[0])  # 最晚完工时间
         return C_finish, list_M, list_S, list_W, tmax
@@ -289,43 +274,36 @@ class GWO_algorithm():
                     job_init[i] = initial_a
                 print('种群初始的最优解:%.0f' % (min(answer)))
                 result.append([gen, min(answer)])  # 记录初始解的最小完工时间
-
             index_sort = np.array(answer).argsort()  # 返回完工时间从小到大的位置索引
             work_job1, work_M1, work_T1 = work_job[index_sort], work_M[index_sort], work_T[index_sort]
             answer1 = np.array(answer)[index_sort]
             job_init1 = job_init[index_sort]
-
             Alpha = job_init1[0]  # α狼
             Beta = job_init1[1]  # β狼
             Delta = job_init1[2]  # δ狼
             a = 2 * (1 - gen / self.generation)
-
             for i in range(3, self.popsize):  # 用最优位置进行工序编码的更新
                 job, machine, machine_time = work_job1[i:i + 1], work_M1[i:i + 1], work_T1[i:i + 1]
                 Ma_W1, Tm_W1, WCross = self.MA_MAtime_List(job, machine, machine_time)
-                x = job_init1[i]
-
+                x = job_init1[i
                 r1 = random.random()  # 灰狼算法解的更新
                 r2 = random.random()
                 A1 = 2 * a * r1 - a
                 C1 = 2 * r2
                 D_alpha = C1 * Alpha - x
                 x1 = x - A1 * D_alpha
-
                 r1 = random.random()
                 r2 = random.random()
                 A2 = 2 * a * r1 - a
                 C2 = 2 * r2
                 D_beta = C2 * Beta - x
                 x2 = x - A2 * D_beta
-
                 r1 = random.random()
                 r2 = random.random()
                 A3 = 2 * a * r1 - a
                 C3 = 2 * r2
                 D_alpha = C3 * Delta - x
                 x3 = x - A3 * D_alpha
-
                 initial_a = (x1 + x2 + x3) / 3  # 更新公式
                 index_work = initial_a.argsort()
                 job_new = []
@@ -334,7 +312,6 @@ class GWO_algorithm():
                 job_new = np.array(job_new).reshape(1, len(work))
                 machine_new, time_new = self.MA_MAtime(job_new, Ma_W1, Tm_W1)
                 C_finish, _, _, _, _ = self.caculate(job_new, machine_new, time_new)
-
                 work_job1[i] = job_new[0]  # 更新工序编码
                 job_init1[i] = initial_a
                 work_M1[i], work_T1[i] = machine_new[0], time_new[0]
@@ -344,7 +321,6 @@ class GWO_algorithm():
                 Ma_W1, Tm_W1, WCross = self.MA_MAtime_List(job, machine, machine_time)
                 job1, machine1, machine_time1 = work_job1[i + 1:i + 2], work_M1[i + 1:i + 2], work_T1[i + 1:i + 2]
                 Ma_W2, Tm_W2, WCross = self.MA_MAtime_List(job1, machine1, machine_time1)
-
                 MC1, TC1, MC2, TC2 = self.machine_cross(Ma_W1, Tm_W1, Ma_W2, Tm_W2, WCross)
                 machine_new, time_new = self.MA_MAtime(job, MC1, TC1)
                 C_finish, _, _, _, _ = self.caculate(job, machine_new, time_new)
@@ -364,13 +340,10 @@ class GWO_algorithm():
             result.append([gen + 1, min(answer)])  # 记录每一次迭代的最优个体
             print('灰狼算法第%.0f次迭代的最优解:%.0f' % (gen + 1, min(answer)))
             best = answer.tolist().index(min(answer))
-
         workpiece_number, machine_number, machine_time=np.array([work_job[best]]), np.array([work_M[best]]), np.array([work_T[best]])
         result=np.array(result).reshape(len(result), 2)[iter,1]
-
         return workpiece_number, machine_number, machine_time, result
-
-#用于初始读取数据，判断是JSP还是FJSP问题。
+# 用于初始读取数据，判断是JSP还是FJSP问题。
 def load_text(file_name):
     try:
         with open(sys.argv[1], "rb") as f:
@@ -381,7 +354,7 @@ def load_text(file_name):
     except FileNotFoundError:
         return str(None), False
 
-#ORTOOLS运行函数
+# ORTOOLS运行函数
 def MinimalJobshopSat(string):
     a = []
     for i in string:
@@ -399,25 +372,19 @@ def MinimalJobshopSat(string):
         if (i + 1) % machine_number == 0:
             jobs_data.append(job)
             job = []
-
     """Minimal jobshop problem."""
     # Create the model.
     model = cp_model.CpModel()
-
     # Computes horizon dynamically as the sum of all durations.
     horizon = sum(task[1] for job in jobs_data for task in job)
-
     # Named tuple to store information about created variables.
     task_type = collections.namedtuple('task_type', 'start end interval')
-
     # Named tuple to manipulate solution information.
     assigned_task_type = collections.namedtuple('assigned_task_type',
                                                 'start job index duration')
-
     # Creates job intervals and add to the corresponding machine lists.
     all_tasks = {}
     machine_to_intervals = collections.defaultdict(list)
-
     for job_id, job in enumerate(jobs_data):
         for task_id, task in enumerate(job):
             machine = task[0]
@@ -430,32 +397,24 @@ def MinimalJobshopSat(string):
             all_tasks[job_id, task_id] = task_type(
                 start=start_var, end=end_var, interval=interval_var)
             machine_to_intervals[machine].append(interval_var)
-
     # Create and add disjunctive constraints.
     for machine in all_machines:
         model.AddNoOverlap(machine_to_intervals[machine])
-
     # Precedences inside a job.
     for job_id, job in enumerate(jobs_data):
         for task_id in range(len(job) - 1):
             model.Add(all_tasks[job_id, task_id +
                                 1].start >= all_tasks[job_id, task_id].end)
-
     # Makespan objective.
     obj_var = model.NewIntVar(0, horizon, 'makespan')
-
     model.AddMaxEquality(obj_var, [
         all_tasks[job_id, len(job) - 1].end
         for job_id, job in enumerate(jobs_data)
     ])
-
     model.Minimize(obj_var)
-
     # Solve model.
     solver = cp_model.CpSolver()
-
     status = solver.Solve(model)
-
     if status == cp_model.OPTIMAL:
         # Create one list of assigned tasks per machine.
         assigned_jobs = collections.defaultdict(list)
@@ -468,7 +427,6 @@ def MinimalJobshopSat(string):
                         job=job_id,
                         index=task_id,
                         duration=task[1]))
-
         # Create per machine output lines.
         print('User time: %.2fs' % solver.UserTime())
         print('Wall time: %.2fs' % solver.WallTime())
@@ -494,13 +452,11 @@ def MinimalJobshopSat(string):
 
 
 if __name__ == '__main__':
-
     time_begin = time.time()
     file_name = sys.argv[1]  #输入文件
     data_input, check = load_text(file_name)
     data_inital = list(map(str, data_input.split()))
     job_num, machine_num = int(data_inital[0]), int(data_inital[1]) #job_num 工件个数 machine_num 机器个数
-
     #判断是否为FJSP问题
     if data_inital[2] == '1':
         #ortools运行
